@@ -22,7 +22,7 @@ public class DbConnection {
 			 * List the MySQL JDBC Drivers Registerd
 			 */
 			listDrivers();
-			System.out.println("Connection established successfully.");
+			//.System.out.println("Connection established successfully.");
 		} catch (ClassNotFoundException e) {
 			System.out.println(
 					"Driver class could not find, please add the mysql-connector.jar file.");
@@ -60,7 +60,7 @@ public class DbConnection {
 		Enumeration<Driver> drivers = DriverManager.getDrivers();
 		while (drivers.hasMoreElements()) {
 			Driver d = drivers.nextElement();
-			System.out.println(d.getClass().getName());
+//			System.out.println(d.getClass().getName());
 		}
 	}
 
