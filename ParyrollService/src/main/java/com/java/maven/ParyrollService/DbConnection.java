@@ -43,11 +43,11 @@ public class DbConnection {
 		 * Set the DB URL to local host database you have created.
 		 * Check the Username and Password set in MySQL
 		 */
-		String jdbcStr = "jdbc:mysql://localhost:3306/payroll_service";
+		String url = "jdbc:mysql://localhost:3306/payroll_service";
 		String userName = "root";
 		String password = "mysql";
 		try {
-			con = DriverManager.getConnection(jdbcStr, userName, password);
+			con = DriverManager.getConnection(url, userName, password);
 		} catch (SQLException e) {
 			System.out.println(
 					"Database connection failed, check your configurations.");
