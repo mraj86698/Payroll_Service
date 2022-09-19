@@ -102,6 +102,9 @@ public class PayrollService {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Showing Employee Payroll Details
+	 */
 	public void showPayrollData() {
 		resetConnection();
 		System.out.println(
@@ -109,7 +112,7 @@ public class PayrollService {
 		try {
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(sql.SELECT_EMP_PAYROLL_DATA);
-
+			System.out.println();
 			while (rs.next()) {
 				System.out.print(rs.getInt("emp_id") + "\t");
 				System.out.print(rs.getString("emp_name") + "\t");
@@ -126,6 +129,32 @@ public class PayrollService {
 			e.printStackTrace();
 		}
 
+	}
+	/**
+	 * Retrieve All Employees  who have joined in a particular data range from the payroll Service
+	 * @param startDate
+	 * @param endDate
+	 */
+	public void getEmpDataByJoinDate(String startDate, String endDate) {
+		resetConnection();
+		System.out.println("---------------Employee data based on join date------------------");
+		try {
+			PreparedStatement ps = con.prepareStatement(sql.SELECT_EMP_DATA_BY_JOIN_DATE);
+			ps.setString(1, startDate);
+			ps.setString(2, endDate);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				System.out.print(rs.getInt("emp_id") + "\t");
+				System.out.print(rs.getString("emp_name") + "\t");
+				System.out.print(rs.getString("join_date") + "\t");
+				System.out.print(rs.getString("gender") + "\t");
+				System.out.println();
+			}
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 
