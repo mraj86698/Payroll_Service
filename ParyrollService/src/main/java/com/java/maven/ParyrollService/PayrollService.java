@@ -69,6 +69,7 @@ public class PayrollService {
 		}
 
 	}
+
 	/**
 	 * Update the Employee Payroll Salary Using Prepared Statement
 	 */
@@ -93,8 +94,7 @@ public class PayrollService {
 				System.out.println("Data is updated successfully");
 				showPayrollData();
 			} else {
-				System.out.println(
-						"Something went wrong while updating the data.");
+				System.out.println("Something went wrong while updating the data.");
 			}
 
 			con.close();
@@ -102,13 +102,13 @@ public class PayrollService {
 			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * Showing Employee Payroll Details
 	 */
 	public void showPayrollData() {
 		resetConnection();
-		System.out.println(
-				"-------------------Employee payroll data-----------------------");
+		System.out.println("-------------------Employee payroll data-----------------------");
 		try {
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(sql.SELECT_EMP_PAYROLL_DATA);
@@ -130,8 +130,11 @@ public class PayrollService {
 		}
 
 	}
+
 	/**
-	 * Retrieve All Employees  who have joined in a particular data range from the payroll Service
+	 * Retrieve All Employees who have joined in a particular data range from the
+	 * payroll Service
+	 *
 	 * @param startDate
 	 * @param endDate
 	 */
@@ -157,5 +160,38 @@ public class PayrollService {
 		}
 	}
 
+	public void aggregate() {
+		resetConnection();
+		try {
+			Statement ps = con.createStatement();
+			ResultSet rs = ps.executeQuery(sql.count);
+			while (rs.next()) {
+				System.out.println("Count Of  Male Gender:"+rs.getInt(1));
+			}
+			Statement ps1 = con.createStatement();
+			ResultSet rs1 = ps1.executeQuery(sql.avg);
+			while (rs1.next()) {
+				System.out.println("Avg of Salary:"+rs1.getInt(1));
+			}
+			Statement ps2 = con.createStatement();
+			ResultSet rs2 = ps2.executeQuery(sql.sum);
+			while (rs2.next()) {
+				System.out.println("Sum of Salary"+rs2.getInt(1));
+			}
+			Statement ps3 = con.createStatement();
+			ResultSet rs3 = ps3.executeQuery(sql.max);
+			while (rs3.next()) {
+				System.out.println("Max of Salary:"+rs3.getInt(1));
+			}
+			Statement ps4 = con.createStatement();
+			ResultSet rs4 = ps4.executeQuery(sql.min);
+			while (rs4.next()) {
+				System.out.println("Min of Salary"+rs4.getInt(1));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
