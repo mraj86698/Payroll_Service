@@ -6,10 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.Scanner;
 
 public class PayrollService {
 	Connection con;
 	SqlQueries sql;
+
+	static Scanner sc = new Scanner(System.in);
 
 	public void resetConnection() {
 		con = DbConnection.init().getConnection();
@@ -25,14 +28,15 @@ public class PayrollService {
 		try {
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(sql.SELECT_EMP_DATA);
-			System.out.println("empId" + "\t" + "empName" + "\t" + "joinDate" + "\t" + "gender");
+			System.out.println("empId" + "\t" + "empName" + "\t" + "joinDate" + "\t" +"gender"+"\t"+"basic_pay");
 			while (rs.next()) {
 				int empId = rs.getInt("emp_id");
 				String empName = rs.getString("emp_name");
 				LocalDate joinDate = rs.getDate("join_date").toLocalDate();
 				String gender = rs.getString("gender");
+				int basic_pay=rs.getInt("basic_pay");
 
-				System.out.println(empId + "\t" + empName + "\t" + joinDate + "\t" + gender);
+				System.out.println(empId + "\t" + empName +"\t"+ basic_pay + "\t" + joinDate + "\t" + gender);
 			}
 
 			con.close();
@@ -42,9 +46,9 @@ public class PayrollService {
 	}
 
 	/**
-	 * Update the Employee Payroll Salary
+	 * Update the Employee Payroll basic_pay
 	 */
-	public void updateSalaryPs(int emp_id, double basic_pay) {
+	public void updatebasic_payPs(int emp_id, double basic_pay) {
 		resetConnection();
 		try {
 			con = DbConnection.init().getConnection();
@@ -71,12 +75,12 @@ public class PayrollService {
 	}
 
 	/**
-	 * Update the Employee Payroll Salary Using Prepared Statement
+	 * Update the Employee Payroll basic_pay Using Prepared Statement
 	 */
-	public void updateSalary(int emp_id, double basic_pay) {
+	public void updatebasic_pay(int emp_id, double basic_pay) {
 		resetConnection();
 		try {
-			PreparedStatement ps = con.prepareStatement(sql.UPDATE_SALARY);
+			PreparedStatement ps = con.prepareStatement(sql.UPDATE_basic_pay);
 			ps.setDouble(1, basic_pay);
 			double deduction = basic_pay * 0.10;
 			ps.setDouble(2, deduction);
@@ -152,6 +156,7 @@ public class PayrollService {
 				System.out.print(rs.getString("emp_name") + "\t");
 				System.out.print(rs.getString("join_date") + "\t");
 				System.out.print(rs.getString("gender") + "\t");
+				System.out.println(rs.getInt("basic_pay")+"\t");
 				System.out.println();
 			}
 			con.close();
@@ -159,7 +164,9 @@ public class PayrollService {
 			e.printStackTrace();
 		}
 	}
-
+	/**
+	 * Aggregate functions for count,sum,avg,min,max is used
+	 */
 	public void aggregate() {
 		resetConnection();
 		try {
@@ -171,27 +178,130 @@ public class PayrollService {
 			Statement ps1 = con.createStatement();
 			ResultSet rs1 = ps1.executeQuery(sql.avg);
 			while (rs1.next()) {
-				System.out.println("Avg of Salary:"+rs1.getInt(1));
+				System.out.println("Avg of basic_pay:"+rs1.getInt(1));
 			}
 			Statement ps2 = con.createStatement();
 			ResultSet rs2 = ps2.executeQuery(sql.sum);
 			while (rs2.next()) {
-				System.out.println("Sum of Salary"+rs2.getInt(1));
+				System.out.println("Sum of basic_pay"+rs2.getInt(1));
 			}
 			Statement ps3 = con.createStatement();
 			ResultSet rs3 = ps3.executeQuery(sql.max);
 			while (rs3.next()) {
-				System.out.println("Max of Salary:"+rs3.getInt(1));
+				System.out.println("Max of basic_pay:"+rs3.getInt(1));
 			}
 			Statement ps4 = con.createStatement();
 			ResultSet rs4 = ps4.executeQuery(sql.min);
 			while (rs4.next()) {
-				System.out.println("Min of Salary"+rs4.getInt(1));
+				System.out.println("Min of basic_pay"+rs4.getInt(1));
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
+	public void addEmpData() {
+		Scanner sc = new Scanner(System.in);
+
+		System.out.println("Enter the employee name : ");
+		String empName = sc.nextLine();
+
+
+		System.out.println("Enter the join date (yyyy-MM-dd) : ");
+		String joinDate = sc.nextLine();
+
+		System.out.println("Enter the gender (M/F/O) : ");
+		String gender = sc.nextLine();
+
+
+		System.out.println("Select the department: ");
+		showDepartmentDetails();
+		String dept_id = sc.nextLine();
+		System.out.println("Enter the basic pay amount : ");
+		double basic_pay = sc.nextDouble();
+
+
+
+		addEmpData(empName, joinDate, gender,dept_id, basic_pay );
+		sc.close();
+	}
+
+	private void addEmpData(String empName, String joinDate, String gender,String dept_id, double basic_pay	) {
+		resetConnection();
+
+		try {
+			PreparedStatement ps = con.prepareStatement(sql.INSERT_EMP_DATA,
+					PreparedStatement.RETURN_GENERATED_KEYS);
+			ps.setString(1, empName);
+			ps.setString(2, joinDate);
+			ps.setString(3, gender);
+			int noOfRowAffected = ps.executeUpdate();
+
+			if (noOfRowAffected == 1) {
+				System.out.println(empName + "'s Data inserted successfully.");
+				ResultSet rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+					int generatedEmpId = rs.getInt(1);
+					String[] dept_ids = dept_id.split(",");
+					for (int i = 0; i < dept_ids.length; i++) {
+						int deptId = Integer.parseInt(dept_ids[i]);
+						addEmpDepartmentDetails(generatedEmpId, deptId);
+					}
+//					addEmpPayrollDetails(generatedEmpId, basic_pay);
+				}
+			} else {
+				System.err.println(
+						"Something went wrong while inserting data to the DB.");
+			}
+			con.close();
+		} catch (SQLException e) {
+			System.err.println(
+					"Something went wrong while inserting data to the DB.");
+			e.printStackTrace();
+		}
+	}
+
+
+	private void addEmpDepartmentDetails(int empId, int deptId) {
+		resetConnection();
+		try {
+			PreparedStatement ps = con
+					.prepareStatement(sql.INSERT_EMP_DEPT_DATA);
+			ps.setInt(1, empId);
+			ps.setInt(2, deptId);
+			int noOfRowsAffected = ps.executeUpdate();
+
+			if (noOfRowsAffected == 1) {
+				System.out.println(
+						"Employee department details added successfully");
+			} else {
+				System.err.println(
+						"Something went wrong while inserting employee department details.");
+			}
+
+		} catch (SQLException e) {
+			System.err.println(
+					"Something went wrong while inserting employee department details.");
+			e.printStackTrace();
+		}
+
+	}
+
+	public void showDepartmentDetails() {
+		resetConnection();
+
+		try {
+			Statement st = con.createStatement();
+			ResultSet rs = st.executeQuery(sql.SELECT_DEPT_DATA);
+			while (rs.next()) {
+				System.out.print(rs.getInt("dept_id") + ".\t");
+				System.out.print(rs.getString("dept_name"));
+				System.out.println();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 }
