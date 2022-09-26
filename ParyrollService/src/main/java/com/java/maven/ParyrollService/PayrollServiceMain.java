@@ -3,10 +3,12 @@ package com.java.maven.ParyrollService;
 import java.util.Scanner;
 
 public class PayrollServiceMain {
+	static Scanner sc = new Scanner(System.in);
 	public static void main(String[] args) {
 		PayrollService service = new PayrollService();
-		Scanner sc = new Scanner(System.in);
-		while (true) {
+
+		int choice=0;
+		while (choice != 9) {
 			System.out.println();
 			System.out.println("Welcome to Employee Payroll Service!");
 			System.out.println(" 1.Read Employee Data");
@@ -17,15 +19,14 @@ public class PayrollServiceMain {
 			System.out.println(" 6.Aggregate Function");
 			System.out.println(" 7.Add Employee Details");
 			System.out.println(" 8.Show Department Details");
-			System.out.println(" 9.Delete Employee Data");
-
+			System.out.println(" 9.EmployeeDepartmentPayrollData");
+			System.out.println("10.exit");
 
 			int input = sc.nextInt();
 			switch (input) {
 			case 1:
 				service.getEmpData();
 				break;
-
 
 			case 2: {
 				System.out.println("Enter Employee ID:");
@@ -58,6 +59,13 @@ public class PayrollServiceMain {
 			case 8:
 				service.showDepartmentDetails();
 				break;
+			case 9:
+				service.showEmpDeptPayrollData();
+				break;
+			case 10: {
+				System.out.println("Thank you for using the application");
+				break;
+			}
 
 			default: {
 				System.out.println("Invalid Input");

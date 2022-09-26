@@ -200,6 +200,9 @@ public class PayrollService {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Add Employee Details to the payroll
+	 */
 	public void addEmpData() {
 		Scanner sc = new Scanner(System.in);
 
@@ -247,7 +250,7 @@ public class PayrollService {
 						int deptId = Integer.parseInt(dept_ids[i]);
 						addEmpDepartmentDetails(generatedEmpId, deptId);
 					}
-//					addEmpPayrollDetails(generatedEmpId, basic_pay);
+					addEmpPayrollDetails(generatedEmpId, basic_pay);
 				}
 			} else {
 				System.err.println(
@@ -261,7 +264,11 @@ public class PayrollService {
 		}
 	}
 
-
+	/**
+	 * To Add Employee Department Details
+	 * @param empId
+	 * @param deptId
+	 */
 	private void addEmpDepartmentDetails(int empId, int deptId) {
 		resetConnection();
 		try {
@@ -286,7 +293,9 @@ public class PayrollService {
 		}
 
 	}
-
+	/**
+	 * To Show Department Details
+	 */
 	public void showDepartmentDetails() {
 		resetConnection();
 
@@ -302,6 +311,68 @@ public class PayrollService {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Add Employee Payroll Details
+	 * @param empId
+	 * @param basic_pay
+	 */
+	private void addEmpPayrollDetails(int empId, double basic_pay) {
+		resetConnection();
+
+		try {
+			PreparedStatement ps = con
+					.prepareStatement(sql.INSERT_EMP_PAYROLL_DATA);
+			ps.setDouble(1, basic_pay);
+			double deduction = basic_pay * 0.10;
+			ps.setDouble(2, deduction);
+			double taxable_pay = basic_pay - deduction;
+			ps.setDouble(3, taxable_pay);
+			double tax = taxable_pay * 0.20;
+			ps.setDouble(4, tax);
+			double net_pay = taxable_pay - tax;
+			ps.setDouble(5, net_pay);
+			ps.setInt(6, empId);
+			int noOfRowsAffected = ps.executeUpdate();
+
+			if (noOfRowsAffected == 1) {
+				System.out.println("Employee payroll data saved successfully.");
+			} else {
+				System.err.println(
+						"Something went wrong while inserting Employee payroll data in DB.");
+			}
+			con.close();
+		} catch (SQLException e) {
+			System.err.println(
+					"Something went wrong while inserting Employee payroll data in DB.");
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * show Employee Department Payroll Data
+	 */
+	public void showEmpDeptPayrollData() {
+		resetConnection();
+		System.out.println(
+				"-------------------Employee payroll data-----------------------");
+		System.out.println("empId" + "\t" + "empName" + "\t\t" + "basic_pay"+"\t\t"+"dept_name");
+		try {
+			Statement st = con.createStatement();
+			ResultSet rs = st.executeQuery(sql.SELECT_EMP_DEPT_PAYROLL_DATA);
+
+			while (rs.next()) {
+				System.out.print(rs.getInt("emp_id") + "\t");
+				System.out.print(rs.getString("emp_name") + "\t\t");
+				System.out.print(rs.getDouble("basic_pay") + "\t\t");
+				System.out.print(rs.getString("dept_name") + "\t\t");
+				System.out.println();
+			}
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 
 
 }
