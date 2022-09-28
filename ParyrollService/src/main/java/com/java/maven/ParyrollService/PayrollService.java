@@ -183,7 +183,7 @@ public class PayrollService {
 			Statement ps2 = con.createStatement();
 			ResultSet rs2 = ps2.executeQuery(sql.sum);
 			while (rs2.next()) {
-				System.out.println("Sum of basic_pay"+rs2.getInt(1));
+				System.out.println("Sum of basic_pay:"+rs2.getInt(1));
 			}
 			Statement ps3 = con.createStatement();
 			ResultSet rs3 = ps3.executeQuery(sql.max);
@@ -193,7 +193,7 @@ public class PayrollService {
 			Statement ps4 = con.createStatement();
 			ResultSet rs4 = ps4.executeQuery(sql.min);
 			while (rs4.next()) {
-				System.out.println("Min of basic_pay"+rs4.getInt(1));
+				System.out.println("Min of basic_pay:"+rs4.getInt(1));
 			}
 
 		} catch (SQLException e) {
